@@ -31,14 +31,16 @@ func NewSourceRunner(src Source, w io.Writer) SourceRunner {
 
 // Start starts your source
 // Example usage would look like this in your main.go
-//  func() main {
-// 	src := newCoolSource()
-// 	runner := airbyte.NewSourceRunner(src)
-// 	err := runner.Start()
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	 }
-//  }
+//
+//	 func() main {
+//		src := newCoolSource()
+//		runner := airbyte.NewSourceRunner(src)
+//		err := runner.Start()
+//		if err != nil {
+//			log.Fatal(err)
+//		 }
+//	 }
+//
 // Yes, it really is that easy!
 func (sr SourceRunner) Start() error {
 	switch cmd(os.Args[1]) {
@@ -56,7 +58,7 @@ func (sr SourceRunner) Start() error {
 		})
 
 	case cmdCheck:
-		inP, err := getSourceConfigPath()
+		inP, err := getConnectorConfigPath()
 		if err != nil {
 			return err
 		}
@@ -81,7 +83,7 @@ func (sr SourceRunner) Start() error {
 		})
 
 	case cmdDiscover:
-		inP, err := getSourceConfigPath()
+		inP, err := getConnectorConfigPath()
 		if err != nil {
 			return err
 		}
@@ -108,7 +110,7 @@ func (sr SourceRunner) Start() error {
 			return err
 		}
 
-		srp, err := getSourceConfigPath()
+		srp, err := getConnectorConfigPath()
 		if err != nil {
 			return err
 		}

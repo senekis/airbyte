@@ -3,11 +3,10 @@ package airbyte
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 )
 
-func getSourceConfigPath() (string, error) {
+func getConnectorConfigPath() (string, error) {
 	if os.Args[2] != "--config" {
 		return "", fmt.Errorf("expect --config")
 	}
@@ -35,22 +34,22 @@ func getCatalogPath() (string, error) {
 // this is most commonly used to unmarshal your State between runs and also unmarshal SourceConfig's
 //
 // Example usage
-//  type CustomState struct {
-// 	 Timestamp int    `json:"timestamp"`
-// 	 Foobar    string `json:"foobar"`
-//  }
 //
-//  func (s *CustomSource) Read(stPath string, ...) error {
-// 	 var cs CustomState
-// 	 err = airbyte.UnmarshalFromPath(stPath, &cs)
-// 	 if err != nil {
-// 		 // handle error
-// 	 }
-//  	 // cs is populated
-//   }
+//	 type CustomState struct {
+//		 Timestamp int    `json:"timestamp"`
+//		 Foobar    string `json:"foobar"`
+//	 }
 //
+//	 func (s *CustomSource) Read(stPath string, ...) error {
+//		 var cs CustomState
+//		 err = airbyte.UnmarshalFromPath(stPath, &cs)
+//		 if err != nil {
+//			 // handle error
+//		 }
+//	 	 // cs is populated
+//	  }
 func UnmarshalFromPath(path string, v interface{}) error {
-	b, err := ioutil.ReadFile(path)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return err
 	}
