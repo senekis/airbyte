@@ -16,6 +16,7 @@ const (
 	cmdCheck    cmd = "check"
 	cmdDiscover cmd = "discover"
 	cmdRead     cmd = "read"
+	cmdWrite    cmd = "write"
 )
 
 type msgType string
@@ -24,9 +25,11 @@ const (
 	msgTypeRecord         msgType = "RECORD"
 	msgTypeState          msgType = "STATE"
 	msgTypeLog            msgType = "LOG"
+	msgTypeSpec           msgType = "SPEC"
 	msgTypeConnectionStat msgType = "CONNECTION_STATUS"
 	msgTypeCatalog        msgType = "CATALOG"
-	msgTypeSpec           msgType = "SPEC"
+	msgTypeTrace          msgType = "TRACE"
+	msgTypeControl        msgType = "CONTROL"
 )
 
 var errInvalidTypePayload = errors.New("message type and payload are invalid")
@@ -38,6 +41,8 @@ type message struct {
 	*logMessage             `json:"log,omitempty"`
 	*ConnectorSpecification `json:"spec,omitempty"`
 	*connectionStatus       `json:"connectionStatus,omitempty"`
+	*trace                  `json:"trace,omitempty"`
+	*control                `json:"control,omitempty"`
 	*Catalog                `json:"catalog,omitempty"`
 }
 
@@ -118,6 +123,59 @@ const (
 
 type connectionStatus struct {
 	Status checkStatus `json:"status"`
+}
+
+type traceType string
+
+const (
+	traceTypeError    traceType = "ERROR"
+	traceTypeEstimate traceType = "ESTIMATE"
+)
+
+type trace struct {
+	Type      traceType            `json:"type"`
+	EmittedAt int64                `json:"emitted_at"`
+	Error     errorTraceMessage    `json:"error"`
+	Estimate  estimateTraceMessage `json:"estimate"`
+}
+
+type failureType string
+
+const (
+	failureTypeSystem failureType = "system_error"
+	failureTypeConfig failureType = "config_error"
+)
+
+type errorTraceMessage struct {
+	Message         string      `json:"message"`
+	InternalMessage string      `json:"internal_message"`
+	StackTrace      string      `json:"stack_trace"`
+	FailureType     failureType `json:"failure_type"`
+}
+
+type estimateType string
+
+const (
+	estimateTypeStream estimateType = "STREAM"
+	estimateTypeSync   estimateType = "SYNC"
+)
+
+type estimateTraceMessage struct {
+	Name         string       `json:"name"`
+	Type         estimateType `json:"type"`
+	Namespace    string       `json:"namespace"`
+	RowEstimate  int          `json:"row_estimate"`
+	ByteEstimate int          `json:"byte_estimate"`
+}
+
+type connectorConfig struct {
+	Config interface{} `json:"config"`
+}
+
+type control struct {
+	Type            string          `json:"type"` // should be "CONNECTOR_CONFIG"
+	EmittedAt       int64           `json:"emitted_at"`
+	ConnectorConfig connectorConfig `json:"connectorConfig"`
 }
 
 // Catalog defines the complete available schema you can sync with a source
