@@ -55,7 +55,8 @@ func (ds DestinationRunner) Start() error {
 			return write(ds.w, &message{
 				Type: msgTypeConnectionStat,
 				connectionStatus: &connectionStatus{
-					Status: checkStatusFailed,
+					Status:  checkStatusFailed,
+					Message: err.Error(),
 				},
 			})
 		}

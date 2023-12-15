@@ -122,7 +122,8 @@ const (
 )
 
 type connectionStatus struct {
-	Status checkStatus `json:"status"`
+	Status  checkStatus `json:"status"`
+	Message string      `json:"message"`
 }
 
 type traceType string
