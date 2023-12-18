@@ -1,5 +1,7 @@
 package airbyte
 
+import "io"
+
 // Destination is the interface you need to define to create your destination!
 type Destination interface {
 	// Spec returns the input "form" spec needed for your destination
@@ -9,5 +11,5 @@ type Destination interface {
 	Check(dstCfgPath string, logTracker LogTracker) error
 
 	// Write will write the actual data from your source to a Propel Data Pool
-	Write(dstCfgPath string, configuredCat *ConfiguredCatalog, tracker MessageTracker) error
+	Write(dstCfgPath string, configuredCat *ConfiguredCatalog, input io.Reader, logTracker LogTracker) error
 }

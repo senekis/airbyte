@@ -2,8 +2,8 @@ package airbyte
 
 import (
 	"io"
-	"log"
-	"os"
+
+	"github.com/spf13/cobra"
 )
 
 // SourceRunner acts as an "orchestrator" of sorts to run your source for you
@@ -43,90 +43,139 @@ func NewSourceRunner(src Source, w io.Writer) SourceRunner {
 //
 // Yes, it really is that easy!
 func (sr SourceRunner) Start() error {
-	switch cmd(os.Args[1]) {
-	case cmdSpec:
-		spec, err := sr.src.Spec(LogTracker{
-			Log: sr.msgTracker.Log,
-		})
-		if err != nil {
-			sr.msgTracker.Log(LogLevelError, "failed"+err.Error())
-			return err
-		}
-		return write(sr.w, &message{
-			Type:                   msgTypeSpec,
-			ConnectorSpecification: spec,
-		})
+	cmd := &cobra.Command{
+		Use:   "source",
+		Short: "Airbyte source",
+	}
 
-	case cmdCheck:
-		inP, err := getConnectorConfigPath()
-		if err != nil {
-			return err
-		}
-		err = sr.src.Check(inP, LogTracker{
-			Log: sr.msgTracker.Log,
-		})
-		if err != nil {
-			log.Println(err)
-			return write(sr.w, &message{
-				Type: msgTypeConnectionStat,
-				connectionStatus: &connectionStatus{
-					Status: checkStatusFailed,
-				},
-			})
-		}
+	cmd.AddCommand(sr.spec())
+	cmd.AddCommand(sr.check())
+	cmd.AddCommand(sr.discover())
+	cmd.AddCommand(sr.read())
 
-		return write(sr.w, &message{
-			Type: msgTypeConnectionStat,
-			connectionStatus: &connectionStatus{
-				Status: checkStatusSuccess,
-			},
-		})
-
-	case cmdDiscover:
-		inP, err := getConnectorConfigPath()
-		if err != nil {
-			return err
-		}
-		ct, err := sr.src.Discover(inP, LogTracker{
-			Log: sr.msgTracker.Log},
-		)
-		if err != nil {
-			return err
-		}
-		return write(sr.w, &message{
-			Type:    msgTypeCatalog,
-			Catalog: ct,
-		})
-
-	case cmdRead:
-		var incat ConfiguredCatalog
-		p, err := getCatalogPath()
-		if err != nil {
-			return err
-		}
-
-		err = UnmarshalFromPath(p, &incat)
-		if err != nil {
-			return err
-		}
-
-		srp, err := getConnectorConfigPath()
-		if err != nil {
-			return err
-		}
-
-		stp, err := getStatePath()
-		if err != nil {
-			return err
-		}
-
-		err = sr.src.Read(srp, stp, &incat, sr.msgTracker)
-		if err != nil {
-			log.Println("failed")
-			return err
-		}
-
+	if err := cmd.Execute(); err != nil {
+		return err
 	}
 
 	return nil
+}
+
+func (sr SourceRunner) spec() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "spec",
+		Short: "Connector configuration schema",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			spec, err := sr.src.Spec(LogTracker{
+				Log: sr.msgTracker.Log,
+			})
+
+			if err != nil {
+				sr.msgTracker.Log(LogLevelError, "failed: "+err.Error())
+				return err
+			}
+
+			return write(sr.w, &message{
+				Type:                   msgTypeSpec,
+				ConnectorSpecification: spec,
+			})
+		},
+	}
+
+	return cmd
+}
+
+func (sr SourceRunner) check() *cobra.Command {
+	var configPath string
+
+	cmd := &cobra.Command{
+		Use:   "check",
+		Args:  cobra.ExactArgs(1),
+		Short: "Validates the given configuration",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			err := sr.src.Check(configPath, LogTracker{
+				Log: sr.msgTracker.Log,
+			})
+
+			if err != nil {
+				return write(sr.w, &message{
+					Type: msgTypeConnectionStat,
+					connectionStatus: &connectionStatus{
+						Status:  checkStatusFailed,
+						Message: err.Error(),
+					},
+				})
+			}
+
+			return write(sr.w, &message{
+				Type: msgTypeConnectionStat,
+				connectionStatus: &connectionStatus{
+					Status: checkStatusSuccess,
+				},
+			})
+		},
+	}
+
+	cmd.Flags().StringVar(&configPath, "config", "", "Configuration file")
+
+	return cmd
+}
+
+func (sr SourceRunner) discover() *cobra.Command {
+	var configPath string
+
+	cmd := &cobra.Command{
+		Use:   "discover",
+		Args:  cobra.ExactArgs(1),
+		Short: "List the available tables",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ct, err := sr.src.Discover(configPath, LogTracker{
+				Log: sr.msgTracker.Log,
+			})
+
+			if err != nil {
+				return err
+			}
+
+			return write(sr.w, &message{
+				Type:    msgTypeCatalog,
+				Catalog: ct,
+			})
+		},
+	}
+
+	cmd.Flags().StringVar(&configPath, "config", "", "Configuration file")
+
+	return cmd
+}
+
+func (sr SourceRunner) read() *cobra.Command {
+	var (
+		configPath  string
+		catalogPath string
+		statePath   string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "read",
+		Args:  cobra.ExactArgs(3),
+		Short: "Extracts data from the underlying data store",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var catalog ConfiguredCatalog
+			if err := UnmarshalFromPath(catalogPath, &catalog); err != nil {
+				return err
+			}
+
+			if err := sr.src.Read(configPath, statePath, &catalog, sr.msgTracker); err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+
+	cmd.Flags().StringVar(&configPath, "config", "", "Configuration file")
+	cmd.Flags().StringVar(&catalogPath, "catalog", "", "Catalog file")
+	cmd.Flags().StringVar(&statePath, "state", "", "State file")
+
+	return cmd
 }

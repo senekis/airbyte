@@ -2,33 +2,8 @@ package airbyte
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 )
-
-func getConnectorConfigPath() (string, error) {
-	if os.Args[2] != "--config" {
-		return "", fmt.Errorf("expect --config")
-	}
-	return os.Args[3], nil
-}
-
-func getStatePath() (string, error) {
-	if len(os.Args) <= 6 {
-		return "", nil
-	}
-	if os.Args[6] != "--state" {
-		return "", fmt.Errorf("expect --state")
-	}
-	return os.Args[7], nil
-}
-
-func getCatalogPath() (string, error) {
-	if os.Args[4] != "--catalog" {
-		return "", fmt.Errorf("expect --catalog")
-	}
-	return os.Args[5], nil
-}
 
 // UnmarshalFromPath is used to unmarshal json files into respective struct's
 // this is most commonly used to unmarshal your State between runs and also unmarshal SourceConfig's
