@@ -86,7 +86,7 @@ func F(value float64) *float64 {
 
 // getTagValue returns a value of the schema's type for the given tag string.
 // Uses JSON parsing if the schema is not a string.
-func getTagValue(s *Schema, t reflect.Type, value string) (interface{}, error) {
+func getTagValue(s *Schema, t reflect.Type, value string) (any, error) {
 	// Special case: strings don't need quotes.
 	if s.Type[0] == TypeString {
 		return value, nil
@@ -101,7 +101,7 @@ func getTagValue(s *Schema, t reflect.Type, value string) (interface{}, error) {
 		return values, nil
 	}
 
-	var v interface{}
+	var v any
 	if err := json.Unmarshal([]byte(value), &v); err != nil {
 		return nil, err
 	}
@@ -138,13 +138,13 @@ type Schema struct {
 	Description          string             `json:"description,omitempty"`
 	Items                *Schema            `json:"items,omitempty"`
 	Properties           map[string]*Schema `json:"properties,omitempty"`
-	AdditionalProperties interface{}        `json:"additionalProperties,omitempty"`
+	AdditionalProperties any                `json:"additionalProperties,omitempty"`
 	PatternProperties    map[string]*Schema `json:"patternProperties,omitempty"`
 	Required             []string           `json:"required,omitempty"`
 	Format               string             `json:"format,omitempty"`
-	Enum                 []interface{}      `json:"enum,omitempty"`
-	Default              interface{}        `json:"default,omitempty"`
-	Example              interface{}        `json:"example,omitempty"`
+	Enum                 []any              `json:"enum,omitempty"`
+	Default              any                `json:"default,omitempty"`
+	Example              any                `json:"example,omitempty"`
 	Minimum              *float64           `json:"minimum,omitempty"`
 	ExclusiveMinimum     *bool              `json:"exclusiveMinimum,omitempty"`
 	Maximum              *float64           `json:"maximum,omitempty"`
@@ -264,7 +264,7 @@ func GenerateFromField(f reflect.StructField, mode Mode) (string, bool, *Schema,
 	}
 
 	if tag, ok := f.Tag.Lookup("enum"); ok {
-		s.Enum = []interface{}{}
+		s.Enum = []any{}
 
 		enumType := f.Type
 		enumSchema := s

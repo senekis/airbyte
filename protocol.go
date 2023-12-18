@@ -86,15 +86,15 @@ func write(w io.Writer, m *message) error {
 
 // record defines a record as per airbyte - a "data point"
 type record struct {
-	EmittedAt int64       `json:"emitted_at"`
-	Namespace string      `json:"namespace"`
-	Data      interface{} `json:"data"`
-	Stream    string      `json:"stream"`
+	EmittedAt int64  `json:"emitted_at"`
+	Namespace string `json:"namespace"`
+	Data      any    `json:"data"`
+	Stream    string `json:"stream"`
 }
 
 // state is used to store data between syncs - useful for incremental syncs and state storage
 type state struct {
-	Data interface{} `json:"data"`
+	Data any `json:"data"`
 }
 
 // LogLevel defines the log levels that can be emitted with airbyte logs
@@ -170,7 +170,7 @@ type estimateTraceMessage struct {
 }
 
 type connectorConfig struct {
-	Config interface{} `json:"config"`
+	Config any `json:"config"`
 }
 
 type control struct {
@@ -299,7 +299,7 @@ type PropertySpec struct {
 	Description  string `json:"description"`
 	PropertyType `json:",omitempty"`
 	Examples     []string                      `json:"examples,omitempty"`
-	Items        map[string]interface{}        `json:"items,omitempty"`
+	Items        map[string]any                `json:"items,omitempty"`
 	Properties   map[PropertyName]PropertySpec `json:"properties,omitempty"`
 	IsSecret     bool                          `json:"airbyte_secret,omitempty"`
 }
@@ -309,10 +309,10 @@ type PropertySpec struct {
 type LogWriter func(level LogLevel, s string) error
 
 // StateWriter is exported for documentation purposes - only use this through MessageTracker
-type StateWriter func(v interface{}) error
+type StateWriter func(v any) error
 
 // RecordWriter is exported for documentation purposes - only use this through MessageTracker
-type RecordWriter func(v interface{}, streamName string, namespace string) error
+type RecordWriter func(v any, streamName string, namespace string) error
 
 func newLogWriter(w io.Writer) LogWriter {
 	return func(lvl LogLevel, s string) error {
@@ -327,7 +327,7 @@ func newLogWriter(w io.Writer) LogWriter {
 
 }
 func newStateWriter(w io.Writer) StateWriter {
-	return func(s interface{}) error {
+	return func(s any) error {
 		return write(w, &message{
 			Type: msgTypeState,
 			state: &state{
@@ -338,7 +338,7 @@ func newStateWriter(w io.Writer) StateWriter {
 }
 
 func newRecordWriter(w io.Writer) RecordWriter {
-	return func(s interface{}, stream string, namespace string) error {
+	return func(s any, stream string, namespace string) error {
 		return write(w, &message{
 			Type: msgTypeRecord,
 			record: &record{

@@ -81,7 +81,7 @@ func (h APISource) Check(srcCfgPath string, logTracker airbyte.LogTracker) error
 	if resp.StatusCode != http.StatusOK {
 		return errors.New("invalid status")
 	}
-	
+
 	return resp.Body.Close()
 }
 
@@ -208,7 +208,7 @@ func (h APISource) Read(sourceCfgPath string, prevStatePath string, configuredCa
 	})
 }
 
-func httpGet(uri string, v interface{}) error {
+func httpGet(uri string, v any) error {
 	resp, err := http.Get(uri)
 	if err != nil {
 		return err

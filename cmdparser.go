@@ -23,7 +23,7 @@ import (
 //		 }
 //	 	 // cs is populated
 //	  }
-func UnmarshalFromPath(path string, v interface{}) error {
+func UnmarshalFromPath(path string, v any) error {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return err

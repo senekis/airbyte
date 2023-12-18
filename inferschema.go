@@ -3,12 +3,13 @@ package airbyte
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bitstrapped/airbyte/schema"
 	"reflect"
+
+	"github.com/bitstrapped/airbyte/schema"
 )
 
-// Infer schema translates golang structs to JSONSchema format
-func InferSchemaFromStruct(i interface{}, logTracker LogTracker) Properties {
+// InferSchemaFromStruct Infer schema translates golang structs to JSONSchema format
+func InferSchemaFromStruct(i any, logTracker LogTracker) Properties {
 	var prop Properties
 
 	s, err := schema.Generate(reflect.TypeOf(i))
