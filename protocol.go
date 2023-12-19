@@ -123,7 +123,7 @@ const (
 
 type connectionStatus struct {
 	Status  checkStatus `json:"status"`
-	Message string      `json:"message"`
+	Message string      `json:"message,omitempty"`
 }
 
 type traceType string
@@ -292,7 +292,7 @@ const (
 )
 
 type PropertyType struct {
-	Type        []PropType      `json:"type,omitempty"`
+	Type        PropType        `json:"type,omitempty"`
 	AirbyteType AirbytePropType `json:"airbyte_type,omitempty"`
 }
 type PropertySpec struct {
