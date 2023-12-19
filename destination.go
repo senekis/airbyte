@@ -11,5 +11,5 @@ type Destination interface {
 	Check(dstCfgPath string, logTracker LogTracker) error
 
 	// Write will write the actual data from your source to a Propel Data Pool
-	Write(dstCfgPath string, configuredCat *ConfiguredCatalog, input io.Reader, logTracker LogTracker) error
+	Write(dstCfgPath string, configuredCat *ConfiguredCatalog, input io.Reader, tracker MessageTracker) error
 }

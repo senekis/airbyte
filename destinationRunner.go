@@ -120,11 +120,7 @@ func (ds DestinationRunner) write() *cobra.Command {
 				return err
 			}
 
-			err := ds.dst.Write(configPath, &catalog, ds.r, LogTracker{
-				Log: ds.msgTracker.Log,
-			})
-
-			if err != nil {
+			if err := ds.dst.Write(configPath, &catalog, ds.r, ds.msgTracker); err != nil {
 				return write(ds.w, &message{
 					Type: msgTypeConnectionStat,
 					connectionStatus: &connectionStatus{
