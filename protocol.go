@@ -278,13 +278,13 @@ const (
 type AirbytePropType string
 
 const (
-	TimestampWithTZ AirbytePropType = "timestamp_with_timezone"
-	TimestampWOTZ   AirbytePropType = "timestamp_without_timezone"
-	TimesWithTZ     AirbytePropType = "time_with_timezone"
-	TimeWOTZ        AirbytePropType = "time_without_timezone"
-	integer         AirbytePropType = "integer"
-	BigInteger      AirbytePropType = "big_integer"
-	BigNumber       AirbytePropType = "big_number"
+	TimestampWithTZ    AirbytePropType = "timestamp_with_timezone"
+	TimestampWOTZ      AirbytePropType = "timestamp_without_timezone"
+	TimeWithTZ         AirbytePropType = "time_with_timezone"
+	TimeWOTZ           AirbytePropType = "time_without_timezone"
+	AirbyteTypeInteger AirbytePropType = "integer"
+	BigInteger         AirbytePropType = "big_integer"
+	BigNumber          AirbytePropType = "big_number"
 )
 
 // FormatType is used to define data type formats supported by airbyte where needed (usually for strings formatted as dates). See more here: https://docs.airbyte.com/understanding-airbyte/supported-data-types
