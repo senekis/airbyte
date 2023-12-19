@@ -52,9 +52,7 @@ func (h APISource) Spec(logTracker airbyte.LogTracker) (*airbyte.ConnectorSpecif
 						Description: "api key to access http source, valid uuid",
 						Examples:    []string{"xxxx-xxxx-xxxx-xxxx"},
 						PropertyType: airbyte.PropertyType{
-							Type: []airbyte.PropType{
-								airbyte.String,
-							},
+							Type: airbyte.String,
 						},
 					},
 				},
@@ -98,13 +96,13 @@ func (h APISource) Discover(srcCfgPath string, logTracker airbyte.LogTracker) (*
 			Properties: map[airbyte.PropertyName]airbyte.PropertySpec{
 				"userid": {
 					PropertyType: airbyte.PropertyType{
-						Type:        []airbyte.PropType{airbyte.Integer, airbyte.Null},
+						Type:        airbyte.Integer,
 						AirbyteType: airbyte.BigInteger},
 					Description: "user ID - see the big int",
 				},
 				"name": {
 					PropertyType: airbyte.PropertyType{
-						Type: []airbyte.PropType{airbyte.String, airbyte.Null},
+						Type: airbyte.String,
 					},
 					Description: "user name",
 				},
@@ -122,13 +120,13 @@ func (h APISource) Discover(srcCfgPath string, logTracker airbyte.LogTracker) (*
 				Properties: map[airbyte.PropertyName]airbyte.PropertySpec{
 					"userid": {
 						PropertyType: airbyte.PropertyType{
-							Type:        []airbyte.PropType{airbyte.Integer, airbyte.Null},
+							Type:        airbyte.Integer,
 							AirbyteType: airbyte.BigInteger},
 						Description: "user ID - see the big int",
 					},
 					"paymentAmount": {
 						PropertyType: airbyte.PropertyType{
-							Type: []airbyte.PropType{airbyte.Integer, airbyte.Null},
+							Type: airbyte.Integer,
 						},
 						Description: "payment amount",
 					},

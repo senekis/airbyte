@@ -266,6 +266,7 @@ type PropType string
 
 const (
 	String  PropType = "string"
+	Boolean PropType = "boolean"
 	Number  PropType = "number"
 	Integer PropType = "integer"
 	Object  PropType = "object"
@@ -279,6 +280,9 @@ type AirbytePropType string
 const (
 	TimestampWithTZ AirbytePropType = "timestamp_with_timezone"
 	TimestampWOTZ   AirbytePropType = "timestamp_without_timezone"
+	TimesWithTZ     AirbytePropType = "time_with_timezone"
+	TimeWOTZ        AirbytePropType = "time_without_timezone"
+	integer         AirbytePropType = "integer"
 	BigInteger      AirbytePropType = "big_integer"
 	BigNumber       AirbytePropType = "big_number"
 )
@@ -288,14 +292,17 @@ type FormatType string
 
 const (
 	Date     FormatType = "date"
-	DateTime FormatType = "datetime"
+	DateTime FormatType = "date-time"
+	Time     FormatType = "time"
 )
 
 type PropertyType struct {
 	Type        PropType        `json:"type,omitempty"`
 	AirbyteType AirbytePropType `json:"airbyte_type,omitempty"`
+	Format      FormatType      `json:"format,omitempty"`
 }
 type PropertySpec struct {
+	Title        string `json:"title"`
 	Description  string `json:"description"`
 	PropertyType `json:",omitempty"`
 	Examples     []string                      `json:"examples,omitempty"`
