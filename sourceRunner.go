@@ -89,7 +89,6 @@ func (sr SourceRunner) check() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "check",
-		Args:  cobra.ExactArgs(1),
 		Short: "Validates the given configuration",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := sr.src.Check(configPath, LogTracker{
@@ -117,6 +116,8 @@ func (sr SourceRunner) check() *cobra.Command {
 
 	cmd.Flags().StringVar(&configPath, "config", "", "Configuration file")
 
+	cobra.CheckErr(cmd.MarkFlagRequired("config"))
+
 	return cmd
 }
 
@@ -125,7 +126,6 @@ func (sr SourceRunner) discover() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "discover",
-		Args:  cobra.ExactArgs(1),
 		Short: "List the available tables",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ct, err := sr.src.Discover(configPath, LogTracker{
@@ -145,6 +145,8 @@ func (sr SourceRunner) discover() *cobra.Command {
 
 	cmd.Flags().StringVar(&configPath, "config", "", "Configuration file")
 
+	cobra.CheckErr(cmd.MarkFlagRequired("config"))
+
 	return cmd
 }
 
@@ -157,7 +159,6 @@ func (sr SourceRunner) read() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "read",
-		Args:  cobra.ExactArgs(3),
 		Short: "Extracts data from the underlying data store",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var catalog ConfiguredCatalog
@@ -176,6 +177,10 @@ func (sr SourceRunner) read() *cobra.Command {
 	cmd.Flags().StringVar(&configPath, "config", "", "Configuration file")
 	cmd.Flags().StringVar(&catalogPath, "catalog", "", "Catalog file")
 	cmd.Flags().StringVar(&statePath, "state", "", "State file")
+
+	cobra.CheckErr(cmd.MarkFlagRequired("config"))
+	cobra.CheckErr(cmd.MarkFlagRequired("catalog"))
+	cobra.CheckErr(cmd.MarkFlagRequired("state"))
 
 	return cmd
 }

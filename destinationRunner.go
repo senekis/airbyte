@@ -76,7 +76,6 @@ func (ds DestinationRunner) check() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "check",
-		Args:  cobra.ExactArgs(1),
 		Short: "Validates the given configuration",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := ds.dst.Check(configPath, LogTracker{
@@ -103,6 +102,7 @@ func (ds DestinationRunner) check() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&configPath, "config", "", "Configuration file")
+	cobra.CheckErr(cmd.MarkFlagRequired("config"))
 
 	return cmd
 }
@@ -113,7 +113,6 @@ func (ds DestinationRunner) write() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "write",
-		Args:  cobra.ExactArgs(2),
 		Short: "Write records at destination",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var catalog ConfiguredCatalog
@@ -146,6 +145,9 @@ func (ds DestinationRunner) write() *cobra.Command {
 
 	cmd.Flags().StringVar(&configPath, "config", "", "Configuration file")
 	cmd.Flags().StringVar(&catalogPath, "catalog", "", "Catalog file")
+
+	cobra.CheckErr(cmd.MarkFlagRequired("config"))
+	cobra.CheckErr(cmd.MarkFlagRequired("catalog"))
 
 	return cmd
 }
